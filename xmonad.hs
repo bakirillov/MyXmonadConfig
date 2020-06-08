@@ -1,3 +1,5 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
+
 import XMonad
 
 -- Hooks
@@ -9,6 +11,7 @@ import XMonad.Hooks.SetWMName
 -- Layouts
 import XMonad.Layout.Tabbed
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Spacing
 
 -- Actions
 import XMonad.Actions.GridSelect
@@ -28,12 +31,10 @@ import Control.Concurrent.MVar
 -- Programs list for GridSelect
 -- TODO: play with GSConfig
 myPrograms = ["firefox", "localc", "lowriter",
-    "freeplane", "atom", "wicd-gtk",
-    "gimp", "gedit", "pcmanfm", "texmaker",
-    "pavucontrol", "evince", "gksu synaptic",
-    "Fritzing", "blender", "dia", "arandr", "chromium-browser",
-    "revelation", "virtualbox", "gdebi-gtk", "steam", "ubuntu-software", 
-    "homebank", "focuswriter", "clamtk", "skypeforlinux", "openscad"
+    "freeplane", "wicd-gtk",
+    "gimp", "kate", "pcmanfm", "texmaker",
+    "pavucontrol", "evince", "blender", "dia", "discord", "obs",
+    "/opt/Buttercup/buttercup-desktop", "~/HDD/apps/Telegram/Telegram"
     ]
 
 mySystemCommands = [
@@ -46,12 +47,14 @@ mySystemCommands = [
 myKeys mm = [((mm, xK_g), goToSelected defaultGSConfig),
         ((mm, xK_s), spawnSelected defaultGSConfig myPrograms),
         ((mm, xK_v), spawnSelected defaultGSConfig mySystemCommands),
-        ((mm, xK_p), shellPrompt defaultXPConfig)]
+        ((mm, xK_p), shellPrompt defaultXPConfig),
+	((mod1Mask, xK_space), spawn $ "python /home/bakirillov/.xmonad/layout.py")]
 
 -- Xmonad layouts
 -- TODO: Play with TopicSpaces. Would be fun to use
-myLayouts = tile ||| Mirror tile ||| progtile ||| Full ||| simpleTabbed
+myLayouts = spacing_tile ||| Mirror spacing_tile ||| Full ||| simpleTabbed
   where
+     spacing_tile = spacingRaw True (Border 0 5 5 5) True (Border 5 5 5 5) True $ tile
      tile   = Tall n d r
      n = 1
      r   = 2/3
@@ -67,9 +70,12 @@ myManageHooks = composeAll
     ]
 
 main = do
+  spawn "lux -s 60%"
+  spawn "expressvpn connect"
+  spawn "xrandr --output DP-0 --right-of HDMI-0"
   spawn "feh --bg-center ~/.xmonad/wallpaper.jpg" -- Copy your wallpaper to wallpaper.jpg before start
   spawn "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 15 --height 12 --transparent true --tint 0x000000 "
-  xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/.xmobarrc"
+  xmproc <- spawnPipe "/home/bakirillov/.local/bin/xmobar /home/bakirillov/.xmonad/.xmobarrc"
   xmonad $ defaultConfig {
     modMask = mod4Mask, -- Windows key
     normalBorderColor = "black",
