@@ -70,17 +70,17 @@ myManageHooks = composeAll
     ]
 
 main = do
-  spawn "lux -s 60%"
+  spawn "lux -s 70%"
   spawn "expressvpn connect"
+  spawn "compton --backend glx --xrender-sync --xrender-sync-fence -fcCz -l -17 -t -17"
   spawn "xrandr --output DP-0 --right-of HDMI-0"
   spawn "feh --bg-center ~/.xmonad/wallpaper.jpg" -- Copy your wallpaper to wallpaper.jpg before start
-  spawn "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 15 --height 12 --transparent true --tint 0x000000 "
   xmproc <- spawnPipe "/home/bakirillov/.local/bin/xmobar /home/bakirillov/.xmonad/.xmobarrc"
   xmonad $ defaultConfig {
     modMask = mod4Mask, -- Windows key
     normalBorderColor = "black",
     focusedBorderColor = "blue",
-    terminal = "terminator",
+    terminal = "xfce4-terminal",
     manageHook = manageDocks <+> myManageHooks,
     layoutHook = avoidStruts $ myLayouts,
     startupHook = setWMName "LG3D",
