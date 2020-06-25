@@ -12,6 +12,8 @@ import XMonad.Hooks.SetWMName
 import XMonad.Layout.Tabbed
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Spacing
+import XMonad.Layout.Grid
+import XMonad.Layout.Cross
 
 -- Actions
 import XMonad.Actions.GridSelect
@@ -30,7 +32,7 @@ import Control.Concurrent.MVar
 
 -- Programs list for GridSelect
 -- TODO: play with GSConfig
-myPrograms = ["firefox", "localc", "lowriter",
+myPrograms = ["qutebrowser", "firefox", "localc", "lowriter",
     "freeplane", "wicd-gtk",
     "gimp", "kate", "pcmanfm", "texmaker",
     "pavucontrol", "evince", "blender", "dia", "discord", "obs",
@@ -40,7 +42,12 @@ myPrograms = ["firefox", "localc", "lowriter",
 mySystemCommands = [
     "gnome-screensaver-command -l",
     "scrot -d 5",
-    "scrot -d 1"
+    "scrot -d 1",
+    "screenkey",
+    "killall screenkey",
+    "gromit-mpx --clear",
+    "shutdown -h now",
+    "shutdown -r now"
     ]
 
 -- Additional keybindings
@@ -52,14 +59,17 @@ myKeys mm = [((mm, xK_g), goToSelected defaultGSConfig),
 
 -- Xmonad layouts
 -- TODO: Play with TopicSpaces. Would be fun to use
-myLayouts = spacing_tile ||| Mirror spacing_tile ||| Full ||| simpleTabbed
+myLayouts = simpleCross ||| spacing_tile ||| Mirror spacing_tile ||| Full ||| simpleTabbed ||| progtile ||| spacing_grid 
   where
-     spacing_tile = spacingRaw True (Border 0 5 5 5) True (Border 5 5 5 5) True $ tile
+     spacing = spacingRaw True (Border 0 5 5 5) True (Border 5 5 5 5) True
+     spacing_tile = spacing $ tile
      tile   = Tall n d r
      n = 1
      r   = 2/3
      d   = 4/100
-     progtile = Tall 1 d $ (1/2)
+     spacing_grid = spacing $ Grid
+     progtile = spacing $ (Tall 1 d $ (1/2))
+     
 
 -- Manage hooks
 myManageHooks = composeAll
@@ -72,6 +82,7 @@ myManageHooks = composeAll
 main = do
   spawn "lux -s 70%"
   spawn "expressvpn connect"
+  spawn "gromit-mpx"
   spawn "compton --backend glx --xrender-sync --xrender-sync-fence -fcCz -l -17 -t -17"
   spawn "xrandr --output DP-0 --right-of HDMI-0"
   spawn "feh --bg-center ~/.xmonad/wallpaper.jpg" -- Copy your wallpaper to wallpaper.jpg before start
@@ -81,6 +92,7 @@ main = do
     normalBorderColor = "black",
     focusedBorderColor = "blue",
     terminal = "xfce4-terminal",
+    focusFollowsMouse = False,
     manageHook = manageDocks <+> myManageHooks,
     layoutHook = avoidStruts $ myLayouts,
     startupHook = setWMName "LG3D",
